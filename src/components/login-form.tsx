@@ -1,71 +1,33 @@
 'use client';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from './ui/form';
-import { Input } from './ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Button } from './ui/button';
 
-const formSchema = z.object({
-  username: z.string().email({ message: 'Insira um email valido!' }),
-  password: z.string().min(8, { message: 'Minimo de 8 caracteres.' }),
-});
+import { singin } from '@/app/actions/auth';
+import { useFormState } from 'react-dom';
+import { Button } from '@/components/ui/button';
+
+
 
 export function LoginForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      username: '',
-      password: '',
-    },
-  });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const [state, action] = useFormState(singin, undefined)
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 flex flex-col justify-center items-center"
-      >
-        <h1 className="font-bold text-4xl">Controle de Finanças</h1>
-        <FormField
-          name="username"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormLabel>Usuário</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="seu email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="password"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormLabel>Senha</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="Sua senha" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" className="w-full">
-          Entrar
-        </Button>
-      </form>
-    </Form>
+    <form
+      action={action}
+      className="flex flex-col justify-center items-center gap-4"
+    >
+      <h1 className="font-bold text-4xl">Controle de Finanças</h1>
+      <div className='flex flex-col text-left'>
+        <label htmlFor='username' className='pb-2'>Usuário</label>
+        <input id="username" name='username' placeholder='Seu usuario' type='email' required className='px-4 border rounded py-2 text-sm' />
+      </div>
+      {state?.errors?.username && <p>{state.errors.username}</p>}
+
+      <div className='flex flex-col' >
+        <label htmlFor='password' className='pb-2'>Usuário</label>
+        <input id="password" name='password' placeholder='Seu usuario' type='password' required className='px-4 border rounded py-2 text-sm' />
+        {state?.errors?.password && <p className='text-xs text-red-500 text-center'>{state.errors.password}</p>}
+      </div>
+      <Button type="submit">Entrar</Button>
+    </form>
   );
 }
